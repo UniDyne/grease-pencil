@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="GreasePencil" default="all" basedir=".">
+
+<property environment="env"/>
+<property file="build.props" />
+<property location="." name="application.home"/>
+
+
+<!--======== PREPARE ========-->
+<target name="prepare">
+	<mkdir dir="${build}" />
+	<tstamp>
+		<format property="build.year" pattern="yyyy" />
+		<format property="test.timestamp" pattern="yyyyMMdd'.'HHmm" />
+		<format property="build.timestamp" pattern="yyyyMMdd" />
+	</tstamp>
+</target>
+
+<!--======== CLEAN ========-->
+<target name="clean" description="Cleans build.">
+	<defaultexcludes remove="**/*~"/>
+	<delete includeEmptyDirs="true" failOnError="false">
+		<fileset dir="${application.home}" includes="*~"/>
+		<fileset dir="${application.home}" includes="**/*~"/>
+		<fileset dir="${build}" includes="**/*"/>
+	</delete>
+	<defaultexcludes default="true"/>
+</target>
+
+<!--======== ALL ========-->
+<target name="all" depends="mergejs,encodejs" description="Builds it." />
+
+<!--======== MERGE ========-->
+<target name="mergejs" description="Merge JavaScript sources.">
+	<concat destfile="${build}/GreasePencil.js">
+		<fileset file="${src}/Native/Base.js" />
+		<fileset file="${src}/Native/Function.js" />
+		<fileset file="${src}/Native/Class.js" />
+		<fileset file="${src}/Native/Abstract.js" />
+		<fileset file="${src}/Native/Number.js" />
+		<fileset file="${src}/Native/Array.js" />
+		<fileset file="${src}/Native/String.js" />
+		
+		<fileset file="${src}/Util/Json.js" />
+		<fileset file="${src}/Util/Options.js" />
+		<fileset file="${src}/Util/Chain.js" />
+		<fileset file="${src}/Util/Events.js" />
+		<fileset file="${src}/Util/Encoder.js" />
+		<fileset file="${src}/Util/Formats.js" />
+		<fileset file="${src}/Util/Template.js" />
+		<fileset file="${src}/Util/Validator.js" />
+		
+		<fileset file="${src}/GreasePencil.js" />
+		
+		<fileset file="${src}/Data/Sequel.js" />
+		<fileset file="${src}/Data/FoxPro.js" />
+		
+		<fileset file="${src}/App/Access.js" />
+		<fileset file="${src}/App/Excel.js" />
+		
+		<fileset file="${src}/Resources.js" />
+		<fileset file="${src}/Reporting.js" />
+	</concat>
+</target>
+
+<!--======== COMPRESS ========-->
+<target name="compressjs" depends="mergejs" description="Compress JavaScript sources.">
+  <java dir="${build}" jar="${yui.jar}" output="${build}/GreasePencil.min.js" fork="true" failonerror="true">
+  	<arg value="--type"/>
+    <arg value="js"/>
+    <arg value="${build}/GreasePencil.js" />
+  </java>
+</target>
+
+</project>
