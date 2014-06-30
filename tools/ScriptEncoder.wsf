@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+	<job id="ScriptEncoder">
+		<?job error="true" debug="false"?>
+		<runtime>
+			<description>Windows Script Encoder</description>
+			<named name="in" helpstring="Input file" type="string" required="true" />
+			<named name="out" helpstring="Output file" type="string" required="true" />
+		</runtime>
+		<script language="JScript"><![CDATA[
+
+var oEncoder = new ActiveXObject("Scripting.Encoder");
+var oFso = new ActiveXObject("Scripting.FileSystemObject");
+
+var inFile = oFso.GetFile(WScript.Arguments.Named("in"));
+var inStream = inFile.OpenAsTextStream(1);
+var strSource = inStream.ReadAll();
+inStream.Close();
+
+var strEncoded = oEncoder.EncodeScriptFile(".js", strSource, 0, "");
+
+var outFile = oFso.CreateTextFile(WScript.Arguments.Named("out"));
+outFile.Write(strEncoded);
+outFile.Close();
+		]]></script>
+	</job>
+</package>

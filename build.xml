@@ -32,14 +32,14 @@
 
 <!--======== MERGE ========-->
 <target name="mergejs" description="Merge JavaScript sources.">
-	<concat destfile="${build}/GreasePencil.js">
-		<fileset file="${src}/Native/Base.js" />
-		<fileset file="${src}/Native/Function.js" />
-		<fileset file="${src}/Native/Class.js" />
-		<fileset file="${src}/Native/Abstract.js" />
-		<fileset file="${src}/Native/Number.js" />
-		<fileset file="${src}/Native/Array.js" />
-		<fileset file="${src}/Native/String.js" />
+	<concat destfile="${build}/_GreasePencil.js">
+		<fileset file="${src}/Lang/Base.js" />
+		<fileset file="${src}/Lang/Function.js" />
+		<fileset file="${src}/Lang/Class.js" />
+		<fileset file="${src}/Lang/Abstract.js" />
+		<fileset file="${src}/Lang/Number.js" />
+		<fileset file="${src}/Lang/Array.js" />
+		<fileset file="${src}/Lang/String.js" />
 		
 		<fileset file="${src}/Util/Json.js" />
 		<fileset file="${src}/Util/Options.js" />
@@ -65,11 +65,21 @@
 
 <!--======== COMPRESS ========-->
 <target name="compressjs" depends="mergejs" description="Compress JavaScript sources.">
-  <java dir="${build}" jar="${yui.jar}" output="${build}/GreasePencil.min.js" fork="true" failonerror="true">
-  	<arg value="--type"/>
-    <arg value="js"/>
-    <arg value="${build}/GreasePencil.js" />
-  </java>
+	<java dir="${build}" jar="${yui.jar}" output="${build}/_GreasePencil.min.js" fork="true" failonerror="true">
+		<arg value="--type"/>
+		<arg value="js"/>
+		<arg value="${build}/_GreasePencil.js" />
+	</java>
+</target>
+
+<!--======== ENCODE ========-->
+<!-- Silly, yes. But it prevents casual modification of the script by users who know enough to be dangerous. ;) -->
+<target name="encodejs" depends="mergejs,compressjs" description="Encode JavaScript sources.">
+	<exec executable="cscript.exe">
+		<arg value="${screnc}"/>
+		<arg value="/in:${build}/_GreasePencil.min.js"/>
+		<arg value="/out:${build}/GreasePencil.js"/>
+	</exec>
 </target>
 
 </project>

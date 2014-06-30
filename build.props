@@ -7,10 +7,7 @@
 src=${basedir}/src
 build=${basedir}/build
 
-libs=e:/libs
-tools=e:/tools
-shrink=e:/JavaScript/dojo-release-1.3.2-shrinksafe
-shrink.jar=${shrink}/shrinksafe.jar
-js.jar=${shrink}/js.jar
-yui.jar=e:/JavaScript/yuicompressor-2.3.6/build/yuicompressor-2.3.6.jar
+tools=${basedir}/tools
+yui.jar=${tools}/yuicompressor-2.4.jar
+screnc=${tools}/ScriptEncoder.wsf
 
