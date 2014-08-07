@@ -9,7 +9,12 @@ GreasePencil.Resources = new Abstract({
 		this.scriptXML.setProperty("SelectionLanguage","XPath");
 	},
 	
-	getData: function(id) {w
+	getText: function(id, type) {
+		var node = this.scriptXML.selectSingleNode("//"+(type?type:"text")+"[@id='"+id+"']");
+		return node.text;
+	},
+	
+	getData: function(id) {
 		var node = this.scriptXML.selectSingleNode("//json[@id='"+id+"']");
 		return Json.decode(node.text);
 	},
