@@ -1,5 +1,5 @@
 /**
-* Generic SQL Data Source class.
+* Generic SQL Data Source class. Simple ODBC.
 **/
 
 var DataSource = new Class({
@@ -12,20 +12,94 @@ var DataSource = new Class({
 		dsn: 'DSN',
 		user: 'user',
 		pass: 'pass',
-		debug: false
+		debug: false,
+		safety: true
 	},
 	
-	initialize: function() {
-		var dbString = "DSN="+this.options.dsn+";Uid="+this.options.user+";Pwd="+this.options.pass;
+	initialize: function(options) {
+		this.setOptions(options);
 		
 		this.connection = new ActiveXObject("ADODB.Connection");
-		this.connection.ConnectionString = dbString;
+		this.connection.ConnectionString = this.getConnectionString();
 		
 		this.command = new ActiveXObject("ADODB.Command");
 		this.recordset = new ActiveXObject("ADODB.RecordSet");
 	},
 	
-	finalize: function() {},
+	getConnectionString: function() {
+		return "DSN="+this.options.dsn+";Uid="+this.options.user+";Pwd="+this.options.pass;
+	},
+	
+	finalize: function() {
+		try {this.recordset.Close();} catch(e) {}
+		try {this.connection.Close();} catch(e) {}
+	},
+	
+	getSchema: function(table) {
+		var schema = {};	
+		var query = "SELECT * FROM information_schema.columns WHERE table_name = '"+table+"'";
+		
+		this.openQuery(query);
+		while(!this.recordset.EOF) {
+			var column = {};
+			column['type'] = this.recordset.Fields('data_type').Value;
+			if(this.recordset.Fields('character_maximum_length').Value)
+				column['charlen'] = this.recordset.Fields('character_maximum_length').Value;
+			else column['charlen'] = 0;
+			schema[this.recordset.Fields('column_name').Value] = column;
+			this.recordset.MoveNext();
+		}
+		this.closeQuery();
+		
+		return schema;
+	},
+	
+	hasRecord: function(table, keyField, keyValue) {
+		var query = "SELECT COUNT(*) FROM \"" + table + "\" WHERE \"" + keyField + "\" = '" + keyValue.replace(/'/g,"''") + "'";
+		
+		this.connection.Open();
+		this.recordset.Open(query);
+		this.recordset.MoveFirst();
+		var result = (this.recordset.Fields(0) > 0);
+		this.recordset.Close();
+		this.connection.Close();
+		
+		return result;
+	},
+	
+	getTableCount: function(table, keyField, keyValue) {
+		keyField = keyField || '1';
+		keyValue = keyValue || '1';
+		
+		var query = "SELECT COUNT(*) FROM \"" + table + "\" WHERE \"" + keyField + "\" = '" + keyValue.replace(/'/g,"''") + "'";
+		this.connection.Open();
+		this.recordset.Open(query);
+		this.recordset.MoveFirst();
+		var result = this.recordset.Fields(0);
+		this.recordset.Close();
+		this.connection.Close();
+		
+		return result;
+	},
+	
+	getTableCount: function(table, keyField, keyValue) {
+		keyField = keyField || '1';
+		keyValue = keyValue || '1';
+		
+		var query = "SELECT COUNT(*) FROM \"" + table + "\" WHERE \"" + keyField + "\" = '" + keyValue.replace(/'/g,"''") + "'";
+		this.connection.Open();
+		this.recordset.Open(query);
+		this.recordset.MoveFirst();
+		var result = this.recordset.Fields(0);
+		this.recordset.Close();
+		this.connection.Close();
+		
+		return result;
+	},
+	
+	hasRecord: function(table, keyField, keyValue) {
+		return (this.getTableCount(table, keyField, keyValue) > 0);
+	},
 	
 	hasRecord: function(table, keys) {
 		var first = true;
@@ -120,25 +194,6 @@ var DataSource = new Class({
 		}
 		
 		this.execQuery(deleteSQL);
-	},
-	
-	getSchema: function(table) {
-		var schema = {};	
-		var query = "SELECT * FROM information_schema.columns WHERE table_name = '"+table+"'";
-		
-		this.openQuery(query);
-		while(!this.recordset.EOF) {
-			var column = {};
-			column['type'] = this.recordset.Fields('data_type').Value;
-			if(this.recordset.Fields('character_maximum_length').Value)
-				column['charlen'] = this.recordset.Fields('character_maximum_length').Value;
-			else column['charlen'] = 0;
-			schema[this.recordset.Fields('column_name').Value] = column;
-			this.recordset.MoveNext();
-		}
-		this.closeQuery();;
-		
-		return schema;
 	},
 	
 	getAll: function(sql, obj) {
@@ -272,6 +327,10 @@ var DataSource = new Class({
 	},
 	
 	mkSql: function(sql, obj) {
-		
+		if(this.options.debug) WScript.StdOut.WriteLine(sql);
+		if(this.options.safety) obj = $modCopy(obj, Validator.sqlSafe);
+		sql = Template.execStatic(sql, obj);
+		if(this.options.debug) WScript.StdOut.WriteLine(sql + "\n" + Json.toString(obj));
+		return sql;
 	}
 });
