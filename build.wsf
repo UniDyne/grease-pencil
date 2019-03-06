@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+	<job>
+	<resource id="config"><![CDATA[
+{
+	src : "%(basedir)src\\",
+	build : "%(basedir)build\\",
+	
+	files : [
+		"Lang/Base.js",
+		"Lang/Function.js",
+		"Lang/Class.js",
+		"Lang/Abstract.js",
+		"Lang/Number.js",
+		"Lang/Array.js",
+		"Lang/String.js",
+		
+		"Util/Json.js",
+		"Util/Options.js",
+		"Util/Chain.js",
+		"Util/Events.js",
+		"Util/Encoder.js",
+		"Util/Formats.js",
+		"Util/Template.js",
+		"Util/Validator.js",
+		
+		"GreasePencil.js",
+		
+		"Data/Sequel.js",
+		"Data/FoxPro.js",
+		
+		"App/Access.js",
+		"App/Excel.js",
+		
+		"Resources.js",
+		"Reporting.js"
+	]
+}
+	]]></resource>
+	
+	<object id="Fso" progid="Scripting.FileSystemObject" />
+	<object id="Shell" progid="WScript.Shell" />
+	<object id="Encoder" progid="Scripting.Encoder" />
+	
+	<script language="JScript"><![CDATA[
+String.prototype.parse = function() { return this.replace(/%\(([A-Za-z0-9_]*)\)/g, function(w,g){return (typeof CONFIG[g] != 'undefined' && CONFIG[g] != null) ? CONFIG[g] : w; }); };
+
+var CONFIG = eval('('+getResource('config')+')');
+CONFIG.basedir = WScript.ScriptFullName.replace(WScript.ScriptName, "");
+	
+	
+var BUILD = CONFIG.build.parse(),
+	SRC = CONFIG.src.parse();
+
+
+// check build dir exists
+if(!Fso.FolderExists(BUILD)) Fso.CreateFolder(BUILD);
+
+
+function merge() {
+	var out = Fso.CreateTextFile(BUILD+"_GreasePencil.js");
+
+	for(var i = 0; i < CONFIG.files.length; i++) {
+		var file = Fso.OpenTextFile(SRC+CONFIG.files[i].parse(), 1, false);
+		data = file.ReadAll();
+		file.Close();
+		
+		out.WriteLine(data);
+	}
+
+	out.close();
+}
+
+function compress() {
+	if(!Fso.FileExists(BUILD+"_GreasePencil.js")) merge();
+	
+	var cmd = "cscript //nologo //Job:compress "+CONFIG.basedir+'tools\\Packer.wsf "/input:'+BUILD+'_GreasePencil.js" "/output:'+BUILD+'GreasePencil.min.js"';
+	Shell.Run(cmd, 7, true);
+}
+
+function encode() {
+	if(!Fso.FileExists(BUILD+"GreasePencil.min.js")) merge();
+	
+	var out = Fso.CreateTextFile(BUILD+"GreasePencil.enc.js");
+	var file = Fso.OpenTextFile(BUILD+"GreasePencil.min.js");
+	data = file.ReadAll();
+	file.Close();
+	out.Write( Encoder.EncodeScriptFile(".js", data, 0, "") );
+	out.Close();
+}
+
+function main() {
+	
+	merge();
+	compress();
+	encode();
+	
+}
+
+main();
+	]]></script>
+	</job>
+</package>
