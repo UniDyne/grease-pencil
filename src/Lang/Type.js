@@ -23,7 +23,7 @@ var Type = function(name, obj) {
 };
 
 Type.isEnumerable = function(obj) {
-	return (obj != null && typeof obj.length == 'number' && $_toString.call(obj) != '[object Function]');
+	return (obj != null && typeof obj.length == 'number' && Object.prototype.toString.call(obj) != '[object Function]');
 };
 
 Type.implement({

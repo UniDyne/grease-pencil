@@ -4,10 +4,6 @@
 * copied and tweaked from early versions of Prototype and MooTools.
 **/
 
-
-var $_toString = Object.prototype.toString;
-var $_slice = Array.prototype.slice;
-
 function typeOf(obj){
 	if (obj == undefined) return false;
 	var type = typeof obj;
@@ -72,7 +68,7 @@ var $_implement = function(name, method){
 	if (previous == null || !previous.$protected) this.prototype[name] = method;
 
 	if (this[name] == null && typeOf(method) == 'function') $_extend.call(this, name, function(item){
-		return method.apply(item, $_slice.call(arguments, 1));
+		return method.apply(item, Array.prototype.slice.call(arguments, 1));
 	});
 
 	return this;

@@ -1,1 +1,1 @@
-Foundation.App = {};
+GreasePencil.App = {};

@@ -7,33 +7,39 @@
 	build : "%(basedir)build\\",
 	
 	files : [
-		"Lang/Base.js",
-		"Lang/Function.js",
-		"Lang/Class.js",
-		"Lang/Abstract.js",
-		"Lang/Number.js",
-		"Lang/Array.js",
-		"Lang/String.js",
+		{ text: "!function(global){", type: "snip" },
+			{ name:"Lang/Base.js", type: "file", required:true },
+			{ name:"Lang/Function.js", type: "file", required:true },
+			{ name:"Lang/Class.js", type: "file", required:true },
+			{ name:"Lang/Abstract.js", type: "file", required:true },
+			{ name:"Lang/Number.js", type: "file", required:true },
+			{ name:"Lang/Array.js", type: "file", required:true },
+			{ name:"Lang/String.js", type: "file", required:true },
+			
+			{ text: "function Exports() { for(var i=0; i<arguments.length; i++) global[arguments[i]]=eval('('+arguments[i]+')'); }", type: "snip" },
+			{ text: "Exports('Class','Abstract','Type','Hash','Exports');", type: "snip" },
+			
+		{ text: "}(this||window);", type: "snip" },
 		
-		"Util/Json.js",
-		"Util/Options.js",
-		"Util/Chain.js",
-		"Util/Events.js",
-		"Util/Encoder.js",
-		"Util/Formats.js",
-		"Util/Template.js",
-		"Util/Validator.js",
+		{ name:"Util/Json.js", type: "file", required:true },
+		{ name:"Util/Options.js", type: "file", required:true },
+		{ name:"Util/Chain.js", type: "file", required:true },
+		{ name:"Util/Events.js", type: "file", required:true },
+		{ name:"Util/Encoder.js", type: "file", required:true },
+		{ name:"Util/Formats.js", type: "file", required:true },
+		{ name:"Util/Template.js", type: "file", required:true },
+		{ name:"Util/Validator.js", type: "file", required:true },
 		
-		"GreasePencil.js",
+		{ name:"GreasePencil.js", type: "file", required:true },
 		
-		"Data/Sequel.js",
-		"Data/FoxPro.js",
+		{ name:"Data/Sequel.js", type: "file", required:true },
+		{ name:"Data/FoxPro.js", type: "file", required:true },
 		
-		"App/Access.js",
-		"App/Excel.js",
+		{ name:"App/Access.js", type: "file", required:true },
+		{ name:"App/Excel.js", type: "file", required:true },
 		
-		"Resources.js",
-		"Reporting.js"
+		{ name:"Resources.js", type: "file", required:true },
+		{ name:"Reporting.js", type: "file", required:true }
 	]
 }
 	]]></resource>
@@ -61,11 +67,17 @@ function merge() {
 	var out = Fso.CreateTextFile(BUILD+"_GreasePencil.js");
 
 	for(var i = 0; i < CONFIG.files.length; i++) {
-		var file = Fso.OpenTextFile(SRC+CONFIG.files[i].parse(), 1, false);
-		data = file.ReadAll();
-		file.Close();
-		
-		out.WriteLine(data);
+		switch(CONFIG.files[i].type || 'file') {
+			case 'snip':
+				out.WriteLine(CONFIG.files[i].text);
+				break;
+			case 'file':
+				var file = Fso.OpenTextFile(SRC+CONFIG.files[i].name.parse(), 1, false);
+				data = file.ReadAll();
+				file.Close();
+				out.WriteLine(data);
+				break;
+		}
 	}
 
 	out.close();
@@ -85,7 +97,7 @@ function encode() {
 	var file = Fso.OpenTextFile(BUILD+"GreasePencil.min.js");
 	data = file.ReadAll();
 	file.Close();
-	out.Write( Encoder.EncodeScriptFile(".js", data, 0, "") );
+	out.Write( "//**Start Encode**"+Encoder.EncodeScriptFile(".js", data, 0, "") );
 	out.Close();
 }
 
