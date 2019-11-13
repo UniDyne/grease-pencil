@@ -13,6 +13,11 @@ GreasePencil.Resources = new Abstract({
 		var node = this.scriptXML.selectSingleNode("//"+(type?type:"text")+"[@id='"+id+"']");
 		return node.text;
 	},
+
+	getAttrib: function(id, type, attrib) {
+		var node = this.scriptXML.selectSingleNode("//"+(type?type:'json')+"[@id='"+id+"']");
+		return node.getAttribute(attrib);
+	},
 	
 	getData: function(id) {
 		var node = this.scriptXML.selectSingleNode("//json[@id='"+id+"']");
@@ -30,13 +35,19 @@ GreasePencil.Resources = new Abstract({
 		return tmpl;
 	},
 	
-	fetchData: function(id, args) {
+
+	fetchData: function(id, args, dataObj) {
 		var query = this.getQuery(id);
-		return Sequel.getAll(query, args);
+		return (dataObj||Sequel).getAll(query, args);
 	},
 
-	fetchRecord: function(id, args) {
+	fetchToTemp: function(id, args, dataObj) {
+		var query = this.getQuery(id).replace('FROM ', 'INTO #'+id+' FROM ');
+		return (dataObj||Sequel).execQuery(query, args);
+	},
+
+	fetchRecord: function(id, args, dataObj) {
 		var query = this.getQuery(id);
-		return Sequel.getFirst(query, args);
+		return (dataObj||Sequel).getFirst(query, args);
 	}
 });

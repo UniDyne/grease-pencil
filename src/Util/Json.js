@@ -33,3 +33,9 @@ var Json = new Abstract({
 		return eval('(' + string + ')');
 	}
 });
+
+// ES-compatible alias
+var JSON = {
+	stringify: Json.encode,
+	parse: Json.decode
+};

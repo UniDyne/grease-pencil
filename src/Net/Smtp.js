@@ -1,4 +1,4 @@
-Foundation.Net.Smtp = new Class({
+GreasePencil.Net.Smtp = new Class({
 	Implements: [Options],
 	
 	options: {

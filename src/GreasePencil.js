@@ -35,10 +35,10 @@ var GreasePencil = new Abstract({
 		var path = WScript.ScriptFullName.replace(WScript.ScriptName, "");
 		
 		// set the BaseDir to the current path
-		Config.BaseDir = path;
+		Config.BaseDir = path.replace(/lib\\?$/i, '');
 		
 		// config file may override BaseDir, but MUST be in same dir as GreasePencil
-		var cfg = Json.decode(this.readFile(path+"config.cfg"));
+		var cfg = Json.decode(this.readFile(path+"lib\\config.cfg"));
 		Config = Config.extend(cfg);
 	}
 });
@@ -54,5 +54,45 @@ function JS2VBArray( objJSArray ) {
     for ( var i = 0; i < objJSArray.length; i++ )
 	    dictionary.add( i, objJSArray[ i ] );
     return dictionary.Items();
+}
+
+function Array2CSV(data, delim) {
+	delim = (delim || ",");
+	var line = "";
+	for(var i = 0; i < data.length; i++) {
+		if(i > 0) line += delim;
+		line += '"' + (data[i]+'').replace('"','""') + '"';
+	}
+	return line;
+}
+
+function CSVtoArray(data, delim) {
+	delim = (delim || ",");
+	var pattern = new RegExp(
+		(
+			// delimiters
+			"(\\" + delim + "|\\r?\\n|\\r|^)" +
+			
+			// quoted
+			"(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+			
+			// non-quoted
+			"([^\"\\" + delim + "\\r\\n]*))"
+		), "gi"
+	);
+	
+	var aData = [[]];
+	var aMatches = null;
+	while(aMatches = pattern.exec(data)) {
+		var matchDelim = aMatches[1];
+		if(matchDelim.length && (matchDelim != delim)) {
+			aData.push([]);
+		}
+		
+		if(aMatches[2]) {
+			aData[aData.length - 1].push(aMatches[2].replace(/\"\"/g, '"'));
+		} else aData[aData.length - 1].push(aMatches[3]);
+	}
+	return aData;
 }
 

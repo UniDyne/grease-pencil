@@ -1,1 +1,1 @@
-Foundation.Net = {};
+GreasePencil.Net = {};

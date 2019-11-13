@@ -1,3 +1,3 @@
-Foundation.Net.Http = new Class({
+GreasePencil.Net.Http = new Class({
 
 });

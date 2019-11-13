@@ -1,3 +1,3 @@
-Foundation.Net.Ftp = new Class({
+GreasePencil.Net.Ftp = new Class({
 
 });
