@@ -36,7 +36,6 @@
 		{ name:"Data/Sequel.js", type: "file", required:true },
 		{ name:"Data/FoxPro.js", type: "file", required:true },
 		
-		{ name:"App/_App.js", type: "file", required:true },
 		{ name:"App/Access.js", type: "file", required:true },
 		{ name:"App/Excel.js", type: "file", required:true },
 		{ name:"App/Progress.js", type: "file", required:false },

@@ -42,6 +42,8 @@ var GreasePencil = new Abstract({
 		Config = Config.extend(cfg);
 	},
 
+	/* namespaces to be used by other modules */
+	App: {},
 	Net: {}
 });
 
