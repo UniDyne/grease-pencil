@@ -38,9 +38,11 @@ var GreasePencil = new Abstract({
 		Config.BaseDir = path.replace(/lib\\?$/i, '');
 		
 		// config file may override BaseDir, but MUST be in same dir as GreasePencil
-		var cfg = Json.decode(this.readFile(path+"lib\\config.cfg"));
+		var cfg = JSON.parse(this.readFile(path+"lib\\config.cfg"));
 		Config = Config.extend(cfg);
-	}
+	},
+
+	Net: {}
 });
 
 // Shorthand macros...
