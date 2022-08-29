@@ -2,6 +2,12 @@
 * Simple event manager.
 **/
 
+var $_removeOn = function(string){
+	return string.replace(/^on([A-Z])/, function(full, first){
+		return first.toLowerCase();
+	});
+};
+
 var Events = new Class({
 	$events: {},
 	

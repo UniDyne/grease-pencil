@@ -1,3 +1,5 @@
+
+
 var Type = function(name, obj) {
 	if(name) {
 		var lower = name.toLowerCase();
@@ -40,39 +42,63 @@ Type.implement({
 
 new Type('Type', Type);
 new Type('Object');
-new Type('WhiteSpace');
-new Type('TextNode');
 new Type('Collection');
 new Type('Arguments');
+// keep for XML / HTA use
+new Type('Element');
+new Type('WhiteSpace');
+new Type('TextNode');
 
 Object.type = Type.isObject;
 
-$_force('String', String, [
-	'charAt', 'charCodeAt', 'concat', 'indexOf', 'lastIndexOf', 'match', 'quote', 'replace', 'search',
-	'slice', 'split', 'substr', 'substring', 'toLowerCase', 'toUpperCase'
-]);
+// force protect status on specific methods in key classes
+// prevents replacement via implement or extend
+!function() {
+	var $_force = function(name, obj, methods) {
+		var isType = (obj != Object);
+		var prototype = obj.prototype;
+		if(isType) obj = new Type(name, obj);
+		for(var i = 0, l = methods.length; i < l; i++) {
+			var key = methods[i],
+				generic = obj[key],
+				proto = prototype[key];
+			if(generic) generic.protect();
+			if(isType && proto) {
+				delete prototype[key];
+				prototype[key] = proto.protect();
+			}
+		}
+		if(isType) obj.implement(prototype);
+		return $_force;
+	};
 
-$_force('Array', Array, [
-	'pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift', 'concat', 'join', 'slice',
-	'indexOf', 'lastIndexOf', 'filter', 'forEach', 'every', 'map', 'some', 'reduce', 'reduceRight'
-]);
+	$_force('String', String, [
+		'charAt', 'charCodeAt', 'concat', 'indexOf', 'lastIndexOf', 'match', 'quote', 'replace', 'search',
+		'slice', 'split', 'substr', 'substring', 'toLowerCase', 'toUpperCase'
+	]);
 
-$_force('Number', Number, [
-	'toExponential', 'toFixed', 'toLocaleString', 'toPrecision'
-]);
+	$_force('Array', Array, [
+		'pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift', 'concat', 'join', 'slice',
+		'indexOf', 'lastIndexOf', 'filter', 'forEach', 'every', 'map', 'some', 'reduce', 'reduceRight'
+	]);
 
-$_force('Function', Function, [
-	'apply', 'call', 'bind'
-]);
+	$_force('Number', Number, [
+		'toExponential', 'toFixed', 'toLocaleString', 'toPrecision'
+	]);
 
-$_force('RegExp', RegExp, [
-	'exec', 'test'
-]);
+	$_force('Function', Function, [
+		'apply', 'call', 'bind'
+	]);
 
-$_force('Object', Object, [
-	'create', 'defineProperty', 'defineProperties', 'keys',
-	'getPrototypeOf', 'getOwnPropertyDescriptor', 'getOwnPropertyNames',
-	'preventExtensions', 'isExtensible', 'seal', 'isSealed', 'freeze', 'isFrozen'
-]);
+	$_force('RegExp', RegExp, [
+		'exec', 'test'
+	]);
 
-$_force('Date', Date, ['now']);
+	$_force('Object', Object, [
+		'create', 'defineProperty', 'defineProperties', 'keys',
+		'getPrototypeOf', 'getOwnPropertyDescriptor', 'getOwnPropertyNames',
+		'preventExtensions', 'isExtensible', 'seal', 'isSealed', 'freeze', 'isFrozen'
+	]);
+
+	$_force('Date', Date, ['now']);
+}();

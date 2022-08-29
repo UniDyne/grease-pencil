@@ -1,3 +1,5 @@
+
+/* to provide compatibility with Type */
 Number.prototype.$family = function() {
 	return isFinite(this) ? 'number' : 'null';
 }.hide();
@@ -46,6 +48,7 @@ Number.implement({
 
 Number.alias('each', 'times');
 
+/* add functions from Math to Number - for simpler code / less typing */
 (function(math){
 	var methods = {};
 	math.each(function(name){

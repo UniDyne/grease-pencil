@@ -1,3 +1,16 @@
+
+var $_mergeOne = function(source, key, current) {
+	switch (typeOf(current)){
+		case 'object':
+			if (typeOf(source[key]) == 'object') Object.merge(source[key], current);
+			else source[key] = Object.clone(current);
+		break;
+		case 'array': source[key] = current.clone(); break;
+		default: source[key] = current;
+	}
+	return source;
+};
+
 Object.extend = $_extend.overloadSetter();
 
 Object.extend({

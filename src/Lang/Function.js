@@ -1,3 +1,14 @@
+
+var $_enumerables = [
+	'hasOwnProperty',
+	'valueOf',
+	'isPrototypeOf',
+	'propertyIsEnumerable',
+	'toLocaleString',
+	'toString',
+	'constructor'
+];
+
 Function.lambda = function(fn) {
 	return (typeof(fn) == 'function') ? fn : function() { return fn; };
 };
