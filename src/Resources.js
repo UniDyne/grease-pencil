@@ -21,7 +21,7 @@ GreasePencil.Resources = new Abstract({
 	
 	getData: function(id) {
 		var node = this.scriptXML.selectSingleNode("//json[@id='"+id+"']");
-		return Json.decode(node.text);
+		return JSON.parse(node.text);
 	},
 	
 	getQuery: function(id) {

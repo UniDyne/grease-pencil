@@ -15,13 +15,14 @@
 			{ name:"Lang/Number.js", type: "file", required:true },
 			{ name:"Lang/Array.js", type: "file", required:true },
 			{ name:"Lang/String.js", type: "file", required:true },
+			{ name:"Util/Json.js", type: "file", required:true },
 			
 			{ text: "function Exports() { for(var i=0; i<arguments.length; i++) global[arguments[i]]=eval('('+arguments[i]+')'); }", type: "snip" },
-			{ text: "Exports('Class','Abstract','Type','Hash','Exports');", type: "snip" },
+			{ text: "Exports('Class','Abstract','Type','Hash','Exports','JSON');", type: "snip" },
 			
 		{ text: "}(this||window);", type: "snip" },
 		
-		{ name:"Util/Json.js", type: "file", required:true },
+		
 		{ name:"Util/Options.js", type: "file", required:true },
 		{ name:"Util/Chain.js", type: "file", required:true },
 		{ name:"Util/Events.js", type: "file", required:true },
@@ -104,15 +105,14 @@ function encode() {
 	out.Close();
 }
 
-function main() {
+(function main() {
 	
 	merge();
 	compress();
 	encode();
 	
-}
+})();
 
-main();
 	]]></script>
 	</job>
 </package>
