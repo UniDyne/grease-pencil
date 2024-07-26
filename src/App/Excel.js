@@ -80,7 +80,7 @@ GreasePencil.App.Excel = new Class({
 		query.TextFileCommaDelimiter = false;
 		query.TextFileSpaceDelimiter = false;
 		query.TextFileOtherDelimiter = delim;
-		query.TextFileColumnDataTypes = JS2VBArray(columnSpec.types);
+		query.TextFileColumnDataTypes = columnsSpec.types.toVBArray();//JS2VBArray(columnSpec.types);
 		query.TextFileTrailingMinusNumbers = true;
 		query.Refresh(BackgroundQuery = false);
 		

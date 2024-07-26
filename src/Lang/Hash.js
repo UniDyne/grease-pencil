@@ -101,6 +101,10 @@ Hash.implement({
 
 	toQueryString: function(base){
 		return Object.toQueryString(this, base);
+	},
+
+	toDictionary: function() {
+		return Object.toDictionary(this);
 	}
 });
 

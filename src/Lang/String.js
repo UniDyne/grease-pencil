@@ -1,14 +1,23 @@
 String.extend({
 	from: function(obj) {
-		return item + '';
+		return obj + '';
 	},
 	
+	// deprecated. Use GUID generator.
 	uniqueID: function() {
 		return Date.now().toString(36);
 	}
 });
 	
 String.implement({
+	left: function(len) {
+		return this.substring(0, len);
+	},
+
+	right: function(len) {
+		return this.substring(this.length - len, this.length);
+	},
+
 	test: function(regex, params){
 		return (($type(regex) == 'string') ? new RegExp(regex, params) : regex).test(this);
 	},

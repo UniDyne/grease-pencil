@@ -134,11 +134,26 @@ Object.extend({
 		});
 
 		return queryString.join('&');
+	},
+
+	// recursively changes JS object to VB Dictionary
+	toDictionary: function(object) {
+		var dict = new ActiveXObject( "Scripting.Dictionary" );
+		var keys = Object.keys(object);
+
+		for(var i = 0; i < keys.length; i++) {
+			if(typeof object[keys[i]] == 'object')
+				dict.add(keys[i], Object.toDictionary(object[keys[i]]));
+			else dict.add(keys[i], object[keys[i]]);
+		}
+		return dict;
 	}
 });
 
+// alias
 Object.each = Object.forEach;
 
+// unsure if this is needed when we have Object.clone()
 Object.implement({
 	clone: function() {
 	  var newObj = (this instanceof Array) ? [] : {};

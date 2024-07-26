@@ -1,5 +1,6 @@
 
 // empty config...
+// need to move this from global to inside GP
 var Config = new Abstract({
 	BaseDir		: '',
 	ScriptName	: 'GreasePencil',
@@ -48,18 +49,25 @@ var GreasePencil = new Abstract({
 });
 
 // Shorthand macros...
+$GP = GreasePencil;
 $FILE = GreasePencil.readFile;
 
 GreasePencil.initialize();
 
 // Many libs assume you are calling from VB
+/* MOVED to Array.toDictionary(), .toVBArray() */
+/*
 function JS2VBArray( objJSArray ) {
     var dictionary = new ActiveXObject( "Scripting.Dictionary" );
     for ( var i = 0; i < objJSArray.length; i++ )
 	    dictionary.add( i, objJSArray[ i ] );
     return dictionary.Items();
 }
+*/
 
+/* REMOVED - Not used here. If needed, move to Array.toCSV() or somesuch */
+/* There are more succinct ways to write this... */
+/*
 function Array2CSV(data, delim) {
 	delim = (delim || ",");
 	var line = "";
@@ -69,7 +77,10 @@ function Array2CSV(data, delim) {
 	}
 	return line;
 }
+*/
 
+/* REMOVED - Not used here. If needed, move to Array.fromCSV() or somesuch */
+/*
 function CSVtoArray(data, delim) {
 	delim = (delim || ",");
 	var pattern = new RegExp(
@@ -99,4 +110,4 @@ function CSVtoArray(data, delim) {
 	}
 	return aData;
 }
-
+*/

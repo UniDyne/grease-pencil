@@ -197,6 +197,18 @@ Array.implement({
 			if(this[i][field] == value) idx = i;
 		}
 		return idx;
+	},
+
+	toDictionary: function() {
+		var dict = new ActiveXObject( "Scripting.Dictionary" );
+		for(var i = 0; i < this.length; i++)
+			dict.add(i, this[i]);
+		return dict;
+	},
+
+	toVBArray: function() {
+		var dict = this.toDictionary();
+		return dict.Items();
 	}
 
 });
