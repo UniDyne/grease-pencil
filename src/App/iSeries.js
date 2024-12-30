@@ -1,4 +1,4 @@
-var iSeries = (function() {
+GreasePencil.App.iSeries = (function() {
 	WScript.StdOut.WriteLine("iSeries Utility Loaded");
 	
 	// This version is to work with the Java iAccess program
@@ -139,3 +139,5 @@ var iSeries = (function() {
 	};
 	
 })();
+
+$_iSeries = GreasePencil.App.iSeries;

@@ -39,7 +39,7 @@
 		{ name:"App/Access.js", type: "file", required:true },
 		{ name:"App/Excel.js", type: "file", required:true },
 		{ name:"App/Progress.js", type: "file", required:false },
-		{ name:"App/AS400.js", type: "file", required:false },
+		{ name:"App/iSeries.js", type: "file", required:false },
 		
 		{ name:"Resources.js", type: "file", required:true },
 		{ name:"Reporting.js", type: "file", required:true }
