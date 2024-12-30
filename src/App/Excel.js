@@ -1,7 +1,16 @@
 GreasePencil.App.Excel = new Class({
-	initialize: function() {
+	initialize: function(blank) {
 		this.oExcel = new ActiveXObject("Excel.Application");
 		this.oExcel.Visible = true;
+
+		if(blank) {
+			// create a new blank wb if Excel didn't open with one
+			if(!this.oExcel.ActiveWorkbook) this.oExcel.Workbooks.Add();
+
+			// required to disable "privacy levels"
+			// not present in older versions of Excel
+			try { this.oExcel.ActiveWorkbook.Queries.FastCombine = true; } catch(e) {}
+		}
 	},
 	
 	openWorkbook: function(inFile) {
@@ -296,21 +305,11 @@ GreasePencil.App.Excel = new Class({
 			this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]+":"+clist[i]).Style = style;
 	},
 	
-	toCurrency: function(cols) {
-		this.toStyle(cols, "Currency");
-	},
-
-	toPercent: function(cols) {
-		this.toStyle(cols, "Percent");
-	},
-
-	toDate: function(cols) {
-		this.toStyle(cols, "Date");
-	},
-
-	toText: function(cols) {
-		this.toStyle(cols, "Text");
-	},
+	// convenience formatters
+	toCurrency: function(cols) { this.toStyle(cols, "Currency"); },
+	toPercent: function(cols) { this.toStyle(cols, "Percent"); },
+	toDate: function(cols) { this.toStyle(cols, "Date"); },
+	toText: function(cols) { this.toStyle(cols, "Text"); },
 
 	colHighlight: function(cols) {
 		if(cols == null) return;
@@ -473,6 +472,8 @@ GreasePencil.App.Excel = new Class({
 //		this.oExcel.ActiveWorkbook.ActiveSheet.Cells(rowNum, colNum)
 		this.oExcel.ActiveWorkbook.ActiveSheet.Range(cellNum).Select();
 //		this.oExcel.ActiveWorkbook.ActiveSheet.Range("A2").Select();
+		
+		// unfreeze before freeze to clear previous state
 		this.oExcel.ActiveWindow.FreezePanes = false;
 		this.oExcel.ActiveWindow.FreezePanes = true;
 	}, 
