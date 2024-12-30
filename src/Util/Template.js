@@ -14,7 +14,18 @@ var Template = new Class({
 		
 		var rxFIELD = /%\(([A-Za-z0-9,_|.]*)\)/g;
 		var rxIF = /@IF\(([A-Za-z0-9,_|.]*)\)((.|\n)*?)@END/g;
+		var rxEACH = /@EACH\(([A-Za-z0-9,_|.]*)\)((.|\n)*?)@END(EACH)?/g;
 		
+		var fnEACH = (function(w, g, txt) {
+			if(! obj[g] ) return "";
+
+			var out = "";
+			for(var i = 0; i < obj[g].length; i++) {
+				out += Template.execStatic(txt, obj[g][i]);
+			}
+			return out;
+		}).bind(this);
+
 		var fnFIELD = (function(w, g) {
 			g = g.split('|');
 			f = (g[0]).split(',');
@@ -50,16 +61,17 @@ var Template = new Class({
 		}).bind(this);
 		
 		
-		output = this.tmpl.replace(rxFIELD,fnFIELD);
+		output = this.tmpl.replace(rxEACH, fnEACH);
+		output = output.replace(rxFIELD,fnFIELD);
 		output = output.replace(rxIF,fnIF);
 		return output;
 	}
 });
 
 Template.execStatic =  function(str, obj) {
-		var fn = (function(w, g) {
-				return (typeof obj[g] != 'undefined' && obj[g] != null)  ? obj[g] : w;
-			});
-		return str.replace(/%\(([A-Za-z0-9_]*)\)/g,fn);
-	};
+	var fn = (function(w, g) {
+			return (typeof obj[g] != 'undefined' && obj[g] != null)  ? obj[g] : w;
+		});
+	return str.replace(/%\(([A-Za-z0-9_]*)\)/g,fn);
+};
 

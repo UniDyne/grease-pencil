@@ -95,101 +95,111 @@ GreasePencil.App.Excel = new Class({
 		this.nameColumns(columnSpec.names);
 	},
 	
-	formatify: function(size) {
-		if(size == null) size = 10;
+
+	/// Changes to formatify and formatify2
+	/// formatify2 is now a stub that calls formatify. Will be removed later.
+	/// 'size' is an optional param that only changes size when specified
+	/// 'toTable' => new param that makes it a table when truthy
+	formatify: function(params) {
+		if(!params || !params.hasOwnProperty) params = { size:10 };
 		this.oExcel.ActiveWorkbook.ActiveSheet.Rows("1:1").Select();
 		this.oExcel.Selection.Font.Bold = true;
 		this.oExcel.ActiveWorkbook.ActiveSheet.Cells.Select();
-		this.oExcel.Selection.Font.Size = size;	
+		if(params.size) this.oExcel.Selection.Font.Size = params.size;	
 		this.oExcel.ActiveWorkbook.ActiveSheet.Cells.EntireColumn.Autofit();
 		this.oExcel.ActiveWorkbook.ActiveSheet.Range("A2").Select();
 		this.oExcel.ActiveWindow.FreezePanes = true;
 		
-		this.oExcel.ActiveWorkbook.ActiveSheet.ListObjects.Add(this.xlSrcRange, this.oExcel.ActiveWorkbook.ActiveSheet.usedRange, null, this.xlYes).Name = "Report";
+		if(params.toTable) this.oExcel.ActiveWorkbook.ActiveSheet.ListObjects.Add(this.xlSrcRange, this.oExcel.ActiveWorkbook.ActiveSheet.usedRange, null, this.xlYes).Name = "Report";
 	},
 	
-	formatify2: function() {
-		this.oExcel.ActiveWorkbook.ActiveSheet.Rows("1:1").Select();
-		this.oExcel.Selection.Font.Bold = true;
-		this.oExcel.ActiveWorkbook.ActiveSheet.Cells.Select();
-		this.oExcel.ActiveWorkbook.ActiveSheet.Cells.EntireColumn.Autofit();
-		this.oExcel.ActiveWorkbook.ActiveSheet.Range("A2").Select();
-		this.oExcel.ActiveWindow.FreezePanes = true;
-	},
+	// DEPRECATED
+	formatify2: function() { this.formatify({}); },
 	
+	// DEPRECATED - Use pageSetup()
 	printify: function() {
-		this.oExcel.ActiveWorkbook.ActiveSheet.PageSetup.PrintTitleRows = "$1:$1";
-		this.oExcel.ActiveWorkbook.ActiveSheet.PageSetup.PrintGridlines = true;
-		this.oExcel.ActiveWorkbook.ActiveSheet.PageSetup.Orientation = this.xlLandscape;
-		this.oExcel.ActiveWorkbook.ActiveSheet.PageSetup.CenterHorizontally = true;
+		this.pageSetup({
+			titleRows: 1,
+			grid: true,
+			center: true,
+			orientation: "landscape"
+		});
 	},
 	
 	setColWidth: function(col, width) {	this.oExcel.ActiveWorkbook.ActiveSheet.Columns(col+":"+col).ColumnWidth = width; },
-		setRowHeight: function(row, height) {	this.oExcel.ActiveWorkbook.ActiveSheet.Rows(row+":"+row).RowHeight = height; },
-		pageSetup: function(setup) {
-			var sheet = this.oExcel.ActiveWorkbook.ActiveSheet;
-			
-			if(setup.orientation) sheet.PageSetup.Orientation = (setup.orientation == "portrait") ? this.xlPortrait : this.xlLandscape;
-			if(setup.paperSize) sheet.PageSetup.PaperSize = (setup.paperSize == "ledger") ? this.xlLedger : setup.paperSize == "legal" ? this.xlLegal : this.xlLetter;
-			if(setup.firstPage) sheet.PageSetup.FirstPageNumber = setup.firstPage;
-			
-			if(setup.centerHeader) sheet.PageSetup.CenterHeader = setup.centerHeader;
-			if(setup.centerFooter) sheet.PageSetup.CenterFooter = setup.centerFooter;
-			if(setup.leftHeader) sheet.PageSetup.LeftHeader = setup.leftHeader;
-			if(setup.leftFooter) sheet.PageSetup.LeftFooter = setup.leftFooter;
-			if(setup.rightHeader) sheet.PageSetup.RightHeader = setup.rightHeader;
-			if(setup.rightFooter) sheet.PageSetup.RightFooter = setup.rightFooter;
-			
-			if(setup.leftMargin) sheet.PageSetup.LeftMargin = this.oExcel.InchesToPoints(setup.leftMargin);
-			if(setup.rightMargin) sheet.PageSetup.RightMargin = this.oExcel.InchesToPoints(setup.rightMargin);
-			if(setup.topMargin) sheet.PageSetup.TopMargin = this.oExcel.InchesToPoints(setup.topMargin);
-			if(setup.bottomMargin) sheet.PageSetup.BottomMargin = this.oExcel.InchesToPoints(setup.bottomMargin);
-			if(setup.headerMargin) sheet.PageSetup.HeaderMargin = this.oExcel.InchesToPoints(setup.headerMargin);
-			if(setup.footerMargin) sheet.PageSetup.FooterMargin = this.oExcel.InchesToPoints(setup.footerMargin);
-			
-			
-			if(setup.hasOwnProperty('fitToPagesWide')) {
-				sheet.PageSetup.Zoom = false;
-				sheet.PageSetup.FitToPagesWide = setup.fitToPagesWide;
+	setRowHeight: function(row, height) {	this.oExcel.ActiveWorkbook.ActiveSheet.Rows(row+":"+row).RowHeight = height; },
+
+	pageSetup: function(setup) {
+		var sheet = this.oExcel.ActiveWorkbook.ActiveSheet;
+		
+		if(setup.orientation) sheet.PageSetup.Orientation = (setup.orientation == "portrait") ? this.xlPortrait : this.xlLandscape;
+		if(setup.paperSize) sheet.PageSetup.PaperSize = (setup.paperSize == "ledger") ? this.xlLedger : setup.paperSize == "legal" ? this.xlLegal : this.xlLetter;
+		if(setup.firstPage) sheet.PageSetup.FirstPageNumber = setup.firstPage;
+		
+		if(setup.centerHeader) sheet.PageSetup.CenterHeader = setup.centerHeader;
+		if(setup.centerFooter) sheet.PageSetup.CenterFooter = setup.centerFooter;
+		if(setup.leftHeader) sheet.PageSetup.LeftHeader = setup.leftHeader;
+		if(setup.leftFooter) sheet.PageSetup.LeftFooter = setup.leftFooter;
+		if(setup.rightHeader) sheet.PageSetup.RightHeader = setup.rightHeader;
+		if(setup.rightFooter) sheet.PageSetup.RightFooter = setup.rightFooter;
+		
+		if(setup.leftMargin) sheet.PageSetup.LeftMargin = this.oExcel.InchesToPoints(setup.leftMargin);
+		if(setup.rightMargin) sheet.PageSetup.RightMargin = this.oExcel.InchesToPoints(setup.rightMargin);
+		if(setup.topMargin) sheet.PageSetup.TopMargin = this.oExcel.InchesToPoints(setup.topMargin);
+		if(setup.bottomMargin) sheet.PageSetup.BottomMargin = this.oExcel.InchesToPoints(setup.bottomMargin);
+		if(setup.headerMargin) sheet.PageSetup.HeaderMargin = this.oExcel.InchesToPoints(setup.headerMargin);
+		if(setup.footerMargin) sheet.PageSetup.FooterMargin = this.oExcel.InchesToPoints(setup.footerMargin);
+		
+		
+		if(setup.hasOwnProperty('fitToPagesWide')) {
+			sheet.PageSetup.Zoom = false;
+			sheet.PageSetup.FitToPagesWide = setup.fitToPagesWide;
+		}
+		if(setup.hasOwnProperty('fitToPagesTall')) {
+			sheet.PageSetup.Zoom = false;
+			sheet.PageSetup.FitToPagesTall = setup.fitToPagesTall;
+		}
+
+		if(setup.titleRows) sheet.PageSetup.PrintTitleRows = "$1:$"+setup.titleRows;
+		sheet.PageSetup.CenterHorizontally = setup.center ? true : false;
+		sheet.PageSetup.PrintGridlines = setup.grid ? true : false;
+	},
+	
+	savePDF: function(filename) {
+		// type, filename, quality, include doc props, ignore print area
+		this.oExcel.ActiveWorkbook.ActiveSheet.ExportAsFixedFormat( Type=this.oExcel.xlTypePDF, Filename=filename, Quality=1 );
+	},
+	
+	toFormat: function(cols, format) {
+		if(cols == null) return;
+		
+		var clist = cols.split('|');
+		for(var i = 0; i < clist.length; i++) {
+			if(clist[i].test(/^[0-9]+$/)) this.oExcel.ActiveWorkbook.ActiveSheet.Rows(clist[i]+":"+clist[i]).NumberFormat = format;
+			else this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]+":"+clist[i]).NumberFormat = format;
+		}
+		
+		this.deselect();
+	},
+	
+	toFormatCells: function(rows, cols, format) {
+		if(cols == null || rows == null) return;
+		var rlist = rows.split('|');
+		var clist = cols.split('|');
+		for(var i = 0; i < rlist.length; i++) {
+			if(!rlist[i].test(/^[0-9]+$/)) continue;  
+			for(var k = 0; k < clist.length; k++) {				
+				this.oExcel.ActiveWorkbook.ActiveSheet.Cells(rlist[i],parseInt(clist[k])).NumberFormat = format;   
 			}
-			if(setup.hasOwnProperty('fitToPagesTall')) {
-				sheet.PageSetup.Zoom = false;
-				sheet.PageSetup.FitToPagesTall = setup.fitToPagesTall;
-			}
-			if(setup.titleRows) sheet.PageSetup.PrintTitleRows = "$1:$"+setup.titleRows;
-		},
-		
-		savePDF: function(filename) {
-			// type, filename, quality, include doc props, ignore print area
-			this.oExcel.ActiveWorkbook.ActiveSheet.ExportAsFixedFormat( Type=this.oExcel.xlTypePDF, Filename=filename, Quality=1 );
-		},
-		
-		toFormat: function(cols, format) {
-			if(cols == null) return;
-			
-			var clist = cols.split('|');
-			for(var i = 0; i < clist.length; i++) {
-				if(clist[i].test(/^[0-9]+$/)) this.oExcel.ActiveWorkbook.ActiveSheet.Rows(clist[i]+":"+clist[i]).NumberFormat = format; //.Select();
-				else this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]+":"+clist[i]).NumberFormat = format; //.Select();
-				//this.oExcel.Selection.NumberFormat = format;
-			}
-			
-			this.deselect();
-		},
-		
-		toFormatCells: function(rows, cols, format) {
-			if(cols == null || rows == null) return;
-			var rlist = rows.split('|');
-			var clist = cols.split('|');
-			for(var i = 0; i < rlist.length; i++) {
-				if(!rlist[i].test(/^[0-9]+$/)) continue;  
-				for(var k = 0; k < clist.length; k++) {				
-					this.oExcel.ActiveWorkbook.ActiveSheet.Cells(rlist[i],parseInt(clist[k])).NumberFormat = format;   
-				}
-			}		
-			this.deselect();
-		},	
-		
+		}		
+		this.deselect();
+	},
+
+	print: function() {
+		this.oExcel.ActiveWorkbook.ActiveSheet.PrintOut();
+	},
+	
+	// DEPRECATED - Use pageSetup() and print() instead.
 	printForm: function() {
 		this.oExcel.ActiveWorkbook.ActiveSheet.PageSetup.PrintTitleRows = "$1:$1";
 		this.oExcel.ActiveWorkbook.ActiveSheet.PageSetup.PrintGridlines = true;
@@ -204,12 +214,13 @@ GreasePencil.App.Excel = new Class({
 		this.oExcel.ActiveWorkbook.ActiveSheet.PrintOut();
 	},
 	
+	// DEPRECATED - Use pageSetup() and print() instead.
 	printit: function() {
 		this.oExcel.ActiveWorkbook.ActiveSheet.PageSetup.PrintGridlines = true;
 		this.oExcel.ActiveWorkbook.ActiveSheet.PageSetup.Orientation = this.xlLandscape;
 		this.oExcel.ActiveWorkbook.ActiveSheet.PageSetup.LeftMargin = 0.25;
 		this.oExcel.ActiveWorkbook.ActiveSheet.PageSetup.RightMargin = 0.25;
-		this.oExcel.ActiveWorkbook.ActiveSheet.PrintOut;
+		this.oExcel.ActiveWorkbook.ActiveSheet.PrintOut();
 	},
 
 	setMargins: function(top, left, bottom, right, head, foot) {
@@ -263,36 +274,26 @@ GreasePencil.App.Excel = new Class({
 		if(cols == null) return;
 		
 		var clist = cols.split(',');
-		for(var i = 0; i < clist.length; i++) {
-			this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]+":"+clist[i]).Style = style;//Select();
-			//this.oExcel.Selection.Style = style;
-		}
+		for(var i = 0; i < clist.length; i++)
+			this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]+":"+clist[i]).Style = style;
 		
-		this.deselect();
 	},
 	
 	setRowStyle: function(rows, style) {
 		if(rows == null) return;
 		
-		var clist = rows.split(',');
-		for(var i = 0; i < clist.length; i++) {
-			this.oExcel.ActiveWorkbook.ActiveSheet.Rows(clist[i]+":"+clist[i]).Style = style;//Select();
-			//this.oExcel.Selection.Style = style;
-		}
+		var rlist = rows.split(',');
+		for(var i = 0; i < rlist.length; i++)
+			this.oExcel.ActiveWorkbook.ActiveSheet.Rows(rlist[i]+":"+rlist[i]).Style = style;
 		
-		this.deselect();
 	},
 
 	toStyle: function(cols, style) {
 		if(cols == null) return;
 		
 		var clist = cols.split(',');
-		for(var i = 0; i < clist.length; i++) {
-			this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]+":"+clist[i]).Select();
-			this.oExcel.Selection.Style = style;
-		}
-		
-		this.deselect();
+		for(var i = 0; i < clist.length; i++)
+			this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]+":"+clist[i]).Style = style;
 	},
 	
 	toCurrency: function(cols) {
@@ -319,8 +320,6 @@ GreasePencil.App.Excel = new Class({
 			this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]+":"+clist[i]).Interior.ColorIndex = 6;
 			this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]+":"+clist[i]).Interior.Pattern = this.xlSolid;
 		}
-		
-		this.deselect();
 	},
 	
 	colBoldValues: function(cols) {
@@ -335,22 +334,7 @@ GreasePencil.App.Excel = new Class({
 			fc(1).Font.Italic = false;
 			fc(1).Font.TintAndShade = 0;
 			fc(1).StopIfTrue = false;
-			
-			/*
-			
-			Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlGreater, _
-				Formula1:="=1"
-			Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
-			With Selection.FormatConditions(1).Font
-				.Bold = True
-				.Italic = False
-				.TintAndShade = 0
-			End With
-			Selection.FormatConditions(1).StopIfTrue = False
-			
-    		*/
 		}
-		this.deselect();
 	},
 	
 	// for a specific cell, do a comparison check on each value & if true, highlight the entire row
@@ -377,21 +361,19 @@ GreasePencil.App.Excel = new Class({
 			this.oExcel.ActiveWorkbook.ActiveSheet.Cells(rowNum + (j*incr), colNum).Interior.ColorIndex = color;
 		}
 		
-		this.deselect();		
 	}, 
 
 	// for a specific column Name, retrieve the number of that column 
 	getColNum: function(colName, tableName) {	
 		if(colName == null) return -1;
 		var colNum = -1; 
-		WScript.StdOut.WriteLine('colName = ' + colName); 
-		WScript.StdOut.WriteLine('tot Cols = ' + this.oExcel.ActiveWorkbook.ActiveSheet.ListObjects(tableName?tableName:"Report").ListColumns.count); 
+		//WScript.StdOut.WriteLine('colName = ' + colName);
+		//WScript.StdOut.WriteLine('tot Cols = ' + this.oExcel.ActiveWorkbook.ActiveSheet.ListObjects(tableName?tableName:"Report").ListColumns.count); 
 		for(var w = 1; w < this.oExcel.ActiveWorkbook.ActiveSheet.ListObjects(tableName?tableName:"Report").ListColumns.count; w++) {
 			if (this.oExcel.ActiveWorkbook.ActiveSheet.ListObjects(tableName?tableName:"Report").ListColumns.Item(w) == colName)   {
 				colNum = w; 
 			}
 		}
-		this.deselect();
 		return colNum; 		
 	},
 	
@@ -412,7 +394,6 @@ GreasePencil.App.Excel = new Class({
 				tot = tot + this.oExcel.ActiveWorkbook.ActiveSheet.Cells(i, colNum).value; 
 			}
 		}
-		this.deselect();  
 		return tot; 	
 	}, 
 	
@@ -470,7 +451,6 @@ GreasePencil.App.Excel = new Class({
 				}
 			}
 		}
-		this.deselect();
 	},	
 
 	addTopHeader: function() {
@@ -501,11 +481,8 @@ GreasePencil.App.Excel = new Class({
 		if(cols == null) return;
 		
 		var clist = cols.split(',');
-		for(var i = 0; i < clist.length; i++) {
-			this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]).EntireColumn.Hidden = true;//.Select(); 
-			//this.oExcel.Selection.EntireColumn.Hidden = true;
-		}
-		this.deselect();
+		for(var i = 0; i < clist.length; i++)
+			this.oExcel.ActiveWorkbook.ActiveSheet.Columns(clist[i]).EntireColumn.Hidden = true;
 	},
 	
 	getColumnLetter: function(n) {
@@ -518,12 +495,6 @@ GreasePencil.App.Excel = new Class({
 			n = Math.floor(n / 26);
 		}
 		
-		
-//		do {
-//			var x = n % 26;
-//			colLetter = String.fromCharCode(65+x)+colLetter;
-//			n = (n - x) / 26;
-//		} while(n > 0);	
 		return colLetter;
 	},
 
@@ -534,11 +505,8 @@ GreasePencil.App.Excel = new Class({
 		for(var i = 0; i < clist.length; i++) {
 			var colLetter = String.fromCharCode(65 + (i%26));
 			if(i >= 26) colLetter = String.fromCharCode(65 + ((i - (i%26)) % 26)) + colLetter;
-			this.oExcel.ActiveWorkbook.ActiveSheet.Range(colLetter+"1").Select();
-			this.oExcel.ActiveCell.FormulaR1C1 = clist[i];
+			this.oExcel.ActiveWorkbook.ActiveSheet.Range(colLetter+"1").FormulaR1C1 = clist[i];
 		}
-		
-		this.deselect();
 	},
 
 	showTotals: function() {
@@ -565,8 +533,6 @@ GreasePencil.App.Excel = new Class({
 				}
 			}
 		}
-		
-		this.deselect();
 	},
 
 	totalAvg: function(colNames, prec, rptnam) {
@@ -576,21 +542,16 @@ GreasePencil.App.Excel = new Class({
 		this.showTotals(rptnam);
 		
 		var clist = colNames.split(',');
-		for(var i = 0; i < clist.length; i++) {
+		for(var i = 0; i < clist.length; i++)
 			this.oExcel.ActiveWorkbook.ActiveSheet.ListObjects(rptnam).ListColumns(clist[i]).TotalsCalculation = this.xlTotalsCalculationAverage;
-		}
-		
-		this.deselect();
 	},
 	
 	hideCols: function(colNames) {
 		if(colNames == null) return;
 		
 		var clist = colNames.split(',');
-		for(var i = 0; i < clist.length; i++) {
+		for(var i = 0; i < clist.length; i++)
 			this.oExcel.ActiveWorkbook.ActiveSheet.ListObjects("Report").ListColumns(clist[i]).Visible = true;
-		}
-		this.deselect();
 	},
 	
 	addSheet: function() {
@@ -605,7 +566,6 @@ GreasePencil.App.Excel = new Class({
 
 	saveAs: function(toFile) {
 		this.oExcel.ActiveWorkbook.SaveAs(Filename = toFile, FileFormat = this.xlWorkbookNormal);
-		//, FileFormat = this.oExcel.xlNormal);
 	},
 
 	save: function() {
